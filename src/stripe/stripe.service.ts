@@ -1,6 +1,7 @@
 // src/stripe/stripe.service.ts
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { ApiProperty } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PurchaseItem } from 'src/entities/purchase-item.entity';
 import { Purchase } from 'src/entities/purchase.entity';
@@ -16,8 +17,22 @@ export class CreatePaymentIntentDto {
 }
 
 export class CreateCheckoutSessionDto {
+  @ApiProperty({
+    description: 'List of vinyl IDs to create a checkout session',
+    example: ['1', '2', '3'],
+  })
   vinylIds: string[];
+
+  @ApiProperty({
+    description: 'URL to redirect after a successful checkout',
+    example: 'https://example.com/checkout-success',
+  })
   successUrl: string;
+
+  @ApiProperty({
+    description: 'URL to redirect after a cancelled checkout',
+    example: 'https://example.com/checkout-failed',
+  })
   cancelUrl: string;
 }
 
@@ -85,7 +100,7 @@ export class StripeService {
         },
       });
       const totalAmount = vinyls.reduce(
-        (previousValue, currentValue) => previousValue + currentValue.price,
+        (previousValue, currentValue) => previousValue + Number(currentValue.price),
         0,
       );
 

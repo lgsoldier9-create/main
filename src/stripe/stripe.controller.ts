@@ -16,6 +16,7 @@ import {
   CreateCheckoutSessionDto,
 } from './stripe.service';
 import { AuthGuard } from 'src/auth/guards/jwt.auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 interface AuthenticatedRequest extends Request {
   user: {
     id: number;
@@ -27,10 +28,11 @@ interface AuthenticatedRequest extends Request {
 }
 @Controller('payments')
 export class StripeController {
-  constructor(private readonly stripeService: StripeService) {}
+  constructor(private readonly stripeService: StripeService) { }
 
   @Post('create-checkout-session')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   async createCheckoutSession(
     @Body() createCheckoutSessionDto: CreateCheckoutSessionDto,
     @Req() req: AuthenticatedRequest,
@@ -44,9 +46,6 @@ export class StripeController {
   @Get('webhook/success')
   async handleSuccessWebhook(
     @Query('session_id') sessionId: string,
-    @Query('payment_intent') paymentIntentId: string,
-    @Res() res: Response,
-    @Req() req: Request,
   ) {
     return await this.stripeService.handleSuccessWebhook(sessionId);
   }
@@ -54,9 +53,6 @@ export class StripeController {
   @Get('webhook/fail')
   async handleFailedWebhook(
     @Query('session_id') sessionId: string,
-    @Query('payment_intent') paymentIntentId: string,
-    @Res() res: Response,
-    @Req() req: Request,
   ) {
     return await this.stripeService.handleFailedWebhook(sessionId);
   }

@@ -10,12 +10,18 @@ import { User } from '../entities/user.entities';
 import * as bcrypt from 'bcryptjs';
 import { CreateGoogleUserDto } from './dto/createGoogleUserDto';
 import { UpdateUserDto } from './dto/updateUserDto';
+import { Purchase } from 'src/entities/purchase.entity';
+import { Review } from 'src/entities/review.entity';
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) {}
+    @InjectRepository(Review)
+    private reviewsRepository: Repository<Review>,
+    @InjectRepository(Purchase)
+    private purchasesRepository: Repository<Purchase>,
+  ) { }
 
   async create(createUserDto: CreateUserDto) {
     const { firstName, lastName, birthdate, email, password, avatarUrl, role } =
@@ -89,5 +95,21 @@ export class UserService {
 
     const newUser = this.usersRepository.create(userData);
     return await this.usersRepository.save(newUser);
+  }
+  async getProfile(userId: number) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    const reviews = await this.reviewsRepository.find({ where: { user: { id: userId } } });
+    const purchases = await this.purchasesRepository.find({ where: { user: { id: userId } } })
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    return {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      birthdate: user.birthdate,
+      avatarUrl: user.avatarUrl,
+      reviews: reviews || [],
+      purchases: purchases || [],
+    };
   }
 }

@@ -6,6 +6,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Review } from './review.entity';
+import { PurchaseItem } from './purchase-item.entity';
 @Entity({ name: 'vinyls' })
 export class Vinyl {
   @PrimaryGeneratedColumn()
@@ -22,6 +23,9 @@ export class Vinyl {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   price: number;
+
+  @OneToMany(() => PurchaseItem, (purchaseItem) => purchaseItem.vinyl)
+  purchaseItems: PurchaseItem[];
 
   @OneToMany(() => Review, (review) => review.vinyl)
   reviews: Review[];

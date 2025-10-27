@@ -27,8 +27,7 @@ export class PurchaseItem {
   @Column()
   vinylId: number;
 
-  @OneToOne(() => Vinyl)
-  @JoinColumn()
+  @ManyToOne(() => Vinyl)
   vinyl: Vinyl;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })

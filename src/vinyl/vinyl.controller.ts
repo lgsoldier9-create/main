@@ -19,12 +19,16 @@ import { Roles } from 'src/auth/guards/roles.decorator';
 import { UserRole } from 'src/user/user-role.enum';
 import { SearchVinylsDto } from './dto/searchDto';
 import { Vinyl } from 'src/entities/vinyl.entity';
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 @Controller('vinyl')
 export class VinylController {
-  constructor(private readonly vinylService: VinylService) {}
+  constructor(private readonly vinylService: VinylService) { }
+
   @Post()
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiResponse({ status: 201, description: 'Create vinyl' })
   async create(@Body() createVinylDto: CreateVinylDto) {
     return await this.vinylService.create(createVinylDto);
   }
@@ -32,19 +36,26 @@ export class VinylController {
   @Put(':id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Update vinyl' })
   async update(
     @Param('id') id: number,
     @Body() updateVinylDto: UpdateVinylDto,
   ) {
     return await this.vinylService.update(id, updateVinylDto);
   }
+
   @Delete('id')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Delete vinyl' })
   async delete(@Param('id') id: number) {
     return await this.vinylService.delete(id);
   }
+
   @Get()
+  @ApiResponse({ status: 200, description: 'Get all vinyls' })
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
@@ -64,8 +75,11 @@ export class VinylController {
       },
     };
   }
+
   @Get('search')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Search vinyls' })
   async searchVinyls(@Query() searchDto: SearchVinylsDto) {
     if (!searchDto.q) {
       throw new BadRequestException('Search term is required');

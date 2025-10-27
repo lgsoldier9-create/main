@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { PurchaseStatus } from 'src/enums/purchase-status';
 import { PurchaseItem } from './purchase-item.entity';
+import { User } from './user.entities';
 
 @Entity({ name: 'purchase' })
 export class Purchase {
@@ -18,6 +19,9 @@ export class Purchase {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   amount: number;
+
+  @ManyToOne(() => User, (user) => user.purchase)
+  user: User;
 
   @Column()
   userId: number;

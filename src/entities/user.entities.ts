@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Review } from './review.entity';
 import { UserRole } from 'src/user/user-role.enum';
+import { Purchase } from './purchase.entity';
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
@@ -39,4 +40,7 @@ export class User {
 
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
+
+  @OneToMany(() => Purchase, (purchase) => purchase.user)
+  purchase: Purchase[];
 }

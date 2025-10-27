@@ -4,6 +4,7 @@ import { LoginDto } from './dto/login.dto';
 import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
 import { Request } from 'express';
 import { AuthGuard } from './guards/jwt.auth.guard';
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 interface AuthenticatedRequest extends Request {
   user: {
     id: number;
@@ -16,7 +17,8 @@ interface AuthenticatedRequest extends Request {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
+  @ApiResponse({ status: 200, description: 'Login user' })
   @Post('login')
   async login(@Body() loginDto: LoginDto): Promise<{
     message: string;
@@ -24,8 +26,10 @@ export class AuthController {
   }> {
     return this.authService.login(loginDto);
   }
+  @ApiResponse({ status: 200, description: 'Logout user' })
   @Post('logout')
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   logout(@Req() req: any) {
     const token = this.extractTokenFromHeader(req);
 
@@ -37,9 +41,11 @@ export class AuthController {
       message: 'Logout successful',
     };
   }
+  @ApiResponse({ status: 200, description: 'Login with Google' })
   @Get('google/login')
   @UseGuards(GoogleAuthGuard)
-  async googleLogin() {}
+  async googleLogin() { }
+  @ApiResponse({ status: 200, description: 'Callback for Google login' })
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   googleCallback(@Req() req: AuthenticatedRequest) {
